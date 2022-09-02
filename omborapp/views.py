@@ -13,7 +13,8 @@ class OmborAPIView(APIView):
 
 class ClientlarAPIView(APIView):
     def get(self, request):
-        clients = Client.objects.filter(user=request.user)
+        ombor = Ombor.objects.get(user=request.user)
+        clients = Client.objects.filter(ombor=ombor)
         ser = ClientSer(clients)
         return Response(ser.data)
     def post(self, request):
@@ -27,7 +28,8 @@ class ClientlarAPIView(APIView):
 class ClientAPIView(APIView):
     def put(self, request, pk):
         client = Client.objects.get(id=pk)
-        ser = ClientSer(client)
+        malumot = request.data
+        ser = ClientSer(client, data=malumot)
         if ser.is_valid():
             ser.save()
             return Response(ser.data, status=status.HTTP_202_ACCEPTED)
@@ -35,7 +37,8 @@ class ClientAPIView(APIView):
 
 class MahsulotlarAPIView(APIView):
     def get(self, request):
-        mahsulotlar = Mahsulot.objects.filter(user=request.user)
+        ombor = Ombor.objects.get(user=request.user)
+        mahsulotlar = Mahsulot.objects.filter(ombor=ombor)
         ser = MahsulotSer(mahsulotlar)
         return Response(ser.data)
     def post(self, request):
@@ -48,7 +51,8 @@ class MahsulotlarAPIView(APIView):
 
 class MahsulotAPIView(APIView):
     def put(self, request, pk):
-        client = Mahsulot.objects.get(id=pk)
+        ombor = Ombor.objects.get(user=request.user)
+        client = Mahsulot.objects.get(ombor=ombor)
         ser = MahsulotSer(client)
         if ser.is_valid():
             ser.save()
@@ -58,7 +62,8 @@ class MahsulotAPIView(APIView):
 
 class StatslarAPIView(APIView):
     def get(self, request):
-        mahsulotlar = Stats.objects.filter(user=request.user)
+        ombor = Ombor.objects.get(user=request.user)
+        mahsulotlar = Stats.objects.filter(ombor=ombor)
         ser = StatsSer(mahsulotlar)
         return Response(ser.data)
 
@@ -72,9 +77,11 @@ class StatslarAPIView(APIView):
 
 class StatsAPIView(APIView):
     def put(self, request, pk):
-        client = Stats.objects.get(id=pk)
-        ser = StatsSer(client)
-        if ser.is_valid():
+        ombor = Ombor.objects.get(user=request.user)
+        stats = Stats.objects.get(id=pk)
+        malumot = request.data
+        ser = StatsSer(stats, data=malumot)
+        if ser.is_valid() and stats.ombor == ombor:
             ser.save()
             return Response(ser.data, status=status.HTTP_202_ACCEPTED)
         return Response(ser.data, status=status.HTTP_406_NOT_ACCEPTABLE)
