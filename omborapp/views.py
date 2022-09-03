@@ -18,20 +18,22 @@ class ClientlarAPIView(APIView):
         ser = ClientSer(clients)
         return Response(ser.data)
     def post(self, request):
+        o =Ombor.objects.get(user=request.user)
         malumot = request.data
         ser = ClientSer(data=malumot)
         if ser.is_valid():
-            ser.save()
+            ser.save(ombor=o)
             return Response(ser.data)
         return Response(ser.errors)
 
 class ClientAPIView(APIView):
     def put(self, request, pk):
+        o = Ombor.objects.get(user=request.user)
         client = Client.objects.get(id=pk)
         malumot = request.data
         ser = ClientSer(client, data=malumot)
         if ser.is_valid():
-            ser.save()
+            ser.save(ombor=o)
             return Response(ser.data, status=status.HTTP_202_ACCEPTED)
         return Response(ser.data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -42,10 +44,11 @@ class MahsulotlarAPIView(APIView):
         ser = MahsulotSer(mahsulotlar)
         return Response(ser.data)
     def post(self, request):
+        o = Ombor.objects.get(user=request.user)
         malumot = request.data
         ser = MahsulotSer(data=malumot)
         if ser.is_valid():
-            ser.save()
+            ser.save(ombor=o)
             return Response(ser.data)
         return Response(ser.errors)
 
@@ -55,7 +58,7 @@ class MahsulotAPIView(APIView):
         client = Mahsulot.objects.get(ombor=ombor)
         ser = MahsulotSer(client)
         if ser.is_valid():
-            ser.save()
+            ser.save(ombor=ombor)
             return Response(ser.data, status=status.HTTP_202_ACCEPTED)
         return Response(ser.data, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -68,10 +71,11 @@ class StatslarAPIView(APIView):
         return Response(ser.data)
 
     def post(self, request):
+        o = Ombor.objects.get(user=request.user)
         malumot = request.data
         ser = StatsSer(data=malumot)
         if ser.is_valid():
-            ser.save()
+            ser.save(ombor=o)
             return Response(ser.data)
         return Response(ser.errors)
 
@@ -82,6 +86,6 @@ class StatsAPIView(APIView):
         malumot = request.data
         ser = StatsSer(stats, data=malumot)
         if ser.is_valid() and stats.ombor == ombor:
-            ser.save()
+            ser.save(ombor=ombor)
             return Response(ser.data, status=status.HTTP_202_ACCEPTED)
         return Response(ser.data, status=status.HTTP_406_NOT_ACCEPTABLE)
